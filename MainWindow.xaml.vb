@@ -67,6 +67,18 @@ Class MainWindow
 
         Update_Check(status.Item("version"), API_Version)
     End Sub
+    ' Clear Cache on button click.
+    Private Sub Button_Clear_Cache_Click(sender As Object, e As RoutedEventArgs) Handles Button_Clear_Cache.Click
+        Dim Task = API_Clear_Cache()
+        Dim OutputString = ""
+
+        If Task Then
+            OutputString = "Cache clear: OK"
+        Else
+            OutputString = "Cache clear: ERR"
+        End If
+        WriteOutput(OutputString)
+    End Sub
     ' Save settings fields settings storage on button click.
     Private Sub Button_Save_Click(sender As Object, e As RoutedEventArgs) Handles Button_Save.Click
         My.Settings.Host = Input_Host.Text
@@ -175,6 +187,25 @@ Class MainWindow
 
         ' Set the URL with the API endpoint to hit
         Dim url As String = My.Settings.Host & "/control/protection"
+
+        ' Create the client for the API call
+        Dim client = New RestClient(url)
+
+        ' Dim result As IRestResponse = client.Execute(request)
+        Dim response As RestResponse = client.Execute(request)
+
+        If response.Content.Contains("OK") Then
+            Return True
+        Else
+            Return False
+        End If
+    End Function
+    Function API_Clear_Cache()
+        ' Bootstrap API call object creation
+        Dim request = API_Request(1, "{}")
+
+        ' Set the URL with the API endpoint to hit
+        Dim url As String = My.Settings.Host & "/control/cache_clear"
 
         ' Create the client for the API call
         Dim client = New RestClient(url)
